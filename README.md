@@ -9,6 +9,10 @@ A small **Progressive Web App** to manage your monthly budget, inspired by the J
 - **Expenses** – add daily expenses with an *amount (€)*, a *date* and a *category*.
 - **Dashboard** – monthly summary, totals per type, a monthly budget progress bar,
   a **week filter** (week 1 to 5 of the month) and a chart you can switch between **pie** and **columns**.
+- **Weekly budget** – the monthly budget is split in 5 weeks (e.g. €1000 → €200 per week). Switch between **Monthly** and **Weekly** views to see what is left to spend.
+- **Quick add** – a floating **+** button on every page opens the expense form instantly.
+- **PDF report** – download a monthly report (summary, weekly budget, pie and column charts, expense list).
+- **Responsive** – sidebar on desktop, bottom bar and bottom-sheet forms on mobile, tables turn into cards.
 - **Tables** – every page lists its items in a table with **Edit** and **Delete** buttons.
 - **Manage** – full lists of categories and expenses.
 - **Installable & offline** – works as an app on your phone or desktop.
@@ -19,7 +23,7 @@ A small **Progressive Web App** to manage your monthly budget, inspired by the J
 
 ## Tech stack
 
-Vite · React · vite-plugin-pwa · Recharts
+Vite · React · vite-plugin-pwa · Recharts · jsPDF (PDF report)
 
 ## Project structure (MVC)
 
@@ -31,13 +35,16 @@ src/
     constants.js            Category types and chart colours
     categoryModel.js        Create / validate categories
     expenseModel.js         Create / validate expenses, filters and totals
+    budgetModel.js          Weekly budget split (monthly budget / 5)
     storage.js              localStorage hook
   controllers/            CONTROLLER: connects models to views
     useBudgetController.js    Data + add / update / delete actions
-    useDashboardController.js Month / week / chart filters and computed figures
+    useDashboardController.js Month / week / chart filters, budget figures, report download
+    useToast.js               Confirmation messages
   views/                  VIEW: what the user sees
     components/             Forms, tables, modal, sidebar
     pages/                  Dashboard, Add, Manage
+  services/pdfReport.js   Builds the monthly PDF report (loaded on demand)
   utils/format.js         Formatting and date helpers
   App.jsx                 Connects the controller to the views
   styles.css              Theme

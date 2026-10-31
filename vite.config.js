@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'icon-180.png'],
       manifest: {
         name: 'Kakeibochan',
         short_name: 'Kakeibochan',

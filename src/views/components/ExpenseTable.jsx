@@ -29,12 +29,12 @@ export default function ExpenseTable({ expenses, categories, onUpdate, onDelete 
               const cat = catById[e.categoryId]
               return (
                 <tr key={e.id}>
-                  <td>{prettyDate(e.date)}</td>
-                  <td>{expenseLabel(e, cat)}</td>
-                  <td>
+                  <td data-label="Date">{prettyDate(e.date)}</td>
+                  <td data-label="Name">{expenseLabel(e, cat)}</td>
+                  <td data-label="Category">
                     {cat && <span className="badge" style={{ '--c': getType(cat.type).color }}>{cat.name}</span>}
                   </td>
-                  <td className="right"><strong>{formatEuro(e.amount)}</strong></td>
+                  <td className="right" data-label="Amount"><strong>{formatEuro(e.amount)}</strong></td>
                   <td className="right actions">
                     <button className="btn-sm" onClick={() => setEditing(e)}>Edit</button>
                     <button className="btn-sm danger" onClick={() => remove(e)}>Delete</button>

@@ -1,44 +1,17 @@
 import { useState } from 'react'
-import CategoryForm from '../components/CategoryForm.jsx'
-import ExpenseForm from '../components/ExpenseForm.jsx'
+import AddTabs from '../components/AddTabs.jsx'
 import CategoryTable from '../components/CategoryTable.jsx'
 import ExpenseTable from '../components/ExpenseTable.jsx'
 
 // Two separate forms (expense / category), each followed by its table
-export default function AddPage({ budget }) {
+export default function AddPage({ budget, notify }) {
   const [tab, setTab] = useState('expense')
-  const [message, setMessage] = useState('')
   const { categories, expenses } = budget
-
-  // Show a short confirmation message
-  const flash = (text) => {
-    setMessage(text)
-    setTimeout(() => setMessage(''), 2500)
-  }
 
   return (
     <>
       <div className="card form-card">
-        <div className="segmented">
-          <button className={tab === 'expense' ? 'on' : ''} onClick={() => setTab('expense')}>New expense</button>
-          <button className={tab === 'category' ? 'on' : ''} onClick={() => setTab('category')}>New category</button>
-        </div>
-
-        {message && <div className="toast">✓ {message}</div>}
-
-        {tab === 'expense' ? (
-          <ExpenseForm
-            categories={categories}
-            submitLabel="Add expense"
-            onNeedCategory={() => setTab('category')}
-            onSubmit={(fields) => { budget.addExpense(fields); flash('Expense added') }}
-          />
-        ) : (
-          <CategoryForm
-            submitLabel="Add category"
-            onSubmit={(fields) => { budget.addCategory(fields); flash('Category added') }}
-          />
-        )}
+        <AddTabs tab={tab} setTab={setTab} budget={budget} onAdded={notify} />
       </div>
 
       <div className="card">

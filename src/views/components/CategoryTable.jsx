@@ -27,8 +27,8 @@ export default function CategoryTable({ categories, expenses, onUpdate, onDelete
               const type = getType(c.type)
               return (
                 <tr key={c.id}>
-                  <td>{c.name}</td>
-                  <td><span className="badge" style={{ '--c': type.color }}>{type.label}</span></td>
+                  <td data-label="Name">{c.name}</td>
+                  <td data-label="Type"><span className="badge" style={{ '--c': type.color }}>{type.label}</span></td>
                   <td className="right actions">
                     <button className="btn-sm" onClick={() => setEditing(c)}>Edit</button>
                     <button className="btn-sm danger" onClick={() => remove(c)}>Delete</button>

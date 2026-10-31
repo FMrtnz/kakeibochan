@@ -1,5 +1,14 @@
+import { useEffect } from 'react'
+
 // Simple modal dialog. Clicking the dark background closes it.
 export default function Modal({ title, onClose, children }) {
+  // Lock the page scroll while the modal is open
+  useEffect(() => {
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previous }
+  }, [])
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>

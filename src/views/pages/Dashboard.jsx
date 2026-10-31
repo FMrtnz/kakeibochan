@@ -25,6 +25,9 @@ export default function Dashboard({ budget: b, onAdd }) {
             </button>
           ))}
         </div>
+        <button className="btn light" onClick={d.downloadReport} disabled={d.downloading}>
+          {d.downloading ? 'Preparing...' : '⬇ Download report (PDF)'}
+        </button>
       </div>
 
       {/* Summary cards */}
@@ -41,16 +44,25 @@ export default function Dashboard({ budget: b, onAdd }) {
         ))}
       </div>
 
-      {/* Monthly budget */}
+      {/* Budget: monthly or weekly view */}
       <div className="card">
         <div className="card-head">
-          <h2>Monthly budget</h2>
-          <label className="budget-input">
-            <input type="number" min="0" step="10" value={b.budget || ''} placeholder="Set budget (€)"
-              onChange={(e) => b.setBudget(parseFloat(e.target.value) || 0)} />
-          </label>
+          <h2>Budget</h2>
+          <div className="segmented small">
+            <button className={d.budgetView === 'month' ? 'on' : ''} onClick={() => d.setBudgetView('month')}>Monthly</button>
+            <button className={d.budgetView === 'week' ? 'on' : ''} onClick={() => d.setBudgetView('week')}>Weekly</button>
+          </div>
         </div>
-        {b.budget > 0 ? (
+
+        <div className="budget-row">
+          <input type="number" min="0" step="10" value={b.budget || ''} placeholder="Monthly budget (€)"
+            aria-label="Monthly budget in euros" onChange={(e) => b.setBudget(parseFloat(e.target.value) || 0)} />
+          {b.budget > 0 && <small className="muted">= {formatEuro(d.weekLimit)} per week</small>}
+        </div>
+
+        {b.budget <= 0 && <small className="muted">Set a monthly budget to follow your spending.</small>}
+
+        {b.budget > 0 && d.budgetView === 'month' && (
           <>
             <div className="progress"><div className={d.over ? 'over' : ''} style={{ width: d.percent + '%' }} /></div>
             <small className="muted">
@@ -59,8 +71,25 @@ export default function Dashboard({ budget: b, onAdd }) {
                 : `${formatEuro(b.budget - d.monthTotal)} left of ${formatEuro(b.budget)}`}
             </small>
           </>
-        ) : (
-          <small className="muted">Set a budget to follow your month.</small>
+        )}
+
+        {b.budget > 0 && d.budgetView === 'week' && (
+          <div className="weeks">
+            {d.weeks.map((w) => (
+              <button key={w.week} className={'week-row' + (d.week === w.week ? ' selected' : '')}
+                onClick={() => d.setWeek(w.week)}>
+                <div className="week-head">
+                  <span><strong>Week {w.week}</strong> <small className="muted">days {w.days}</small></span>
+                  <strong className={w.over ? 'neg' : 'pos'}>
+                    {w.over ? `Over by ${formatEuro(-w.remaining)}` : `${formatEuro(w.remaining)} left`}
+                  </strong>
+                </div>
+                <div className="progress"><div className={w.over ? 'over' : ''} style={{ width: w.percent + '%' }} /></div>
+                <small className="muted">{formatEuro(w.spent)} of {formatEuro(w.limit)}</small>
+              </button>
+            ))}
+            <small className="muted">Tap a week to filter the dashboard.</small>
+          </div>
         )}
       </div>
 
@@ -93,8 +122,9 @@ export default function Dashboard({ budget: b, onAdd }) {
               ) : (
                 <BarChart data={d.chartData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" />
-                  <YAxis tickFormatter={(v) => '€' + v} width={60} />
+                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 11 }}
+                    tickFormatter={(n) => (n.length > 9 ? n.slice(0, 8) + '…' : n)} />
+                  <YAxis tickFormatter={(v) => '€' + v} width={55} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => formatEuro(v)} />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                     {d.chartData.map((x) => <Cell key={x.name} fill={x.color} />)}
