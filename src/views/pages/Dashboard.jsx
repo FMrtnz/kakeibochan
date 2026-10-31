@@ -4,6 +4,8 @@ import {
 } from 'recharts'
 import useDashboardController from '../../controllers/useDashboardController.js'
 import ExpenseTable from '../components/ExpenseTable.jsx'
+import MonthPicker from '../components/MonthPicker.jsx'
+import { WEEK_DAYS } from '../../models/budgetModel.js'
 import { formatEuro } from '../../utils/format.js'
 
 // The view only displays what the dashboard controller computes
@@ -14,10 +16,9 @@ export default function Dashboard({ budget: b, onAdd }) {
     <>
       {/* Filters */}
       <div className="card filters">
-        <label className="field inline">
-          <span>Month</span>
-          <input type="month" value={d.month} onChange={(e) => e.target.value && d.setMonth(e.target.value)} />
-        </label>
+        <MonthPicker month={d.month} onChange={d.setMonth} />
+
+        {/* Desktop: week buttons */}
         <div className="chips">
           {['all', 1, 2, 3, 4, 5].map((w) => (
             <button key={w} className={'chip' + (d.week === w ? ' on' : '')} onClick={() => d.setWeek(w)}>
@@ -25,6 +26,15 @@ export default function Dashboard({ budget: b, onAdd }) {
             </button>
           ))}
         </div>
+
+        {/* Mobile: dropdown menu */}
+        <select className="week-select" aria-label="Filter by week" value={d.week}
+          onChange={(e) => d.setWeek(e.target.value === 'all' ? 'all' : Number(e.target.value))}>
+          <option value="all">Whole month</option>
+          {WEEK_DAYS.map((days, i) => (
+            <option key={days} value={i + 1}>Week {i + 1} (days {days})</option>
+          ))}
+        </select>
         <button className="btn light" onClick={d.downloadReport} disabled={d.downloading}>
           {d.downloading ? 'Preparing...' : '⬇ Download report (PDF)'}
         </button>

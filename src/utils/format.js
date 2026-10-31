@@ -23,3 +23,16 @@ export const prettyDate = (isoDate) =>
 
 // Simple unique id
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+
+// Move a "YYYY-MM" month forward / backward: ("2026-10", -1) -> "2026-09"
+export const shiftMonth = (month, delta) => {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y, m - 1 + delta, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+// "2026-10" -> "October 2026"
+export const monthLabel = (month) => {
+  const [y, m] = month.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+}

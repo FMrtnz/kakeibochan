@@ -168,6 +168,10 @@ form .btn { width: 100%; }
 .pos { color: #17c653; }
 .neg { color: #f1416c; }
 .filters .btn { margin-left: auto; }
+.filters { align-items: center; }
+.month-picker { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); border-radius: 10px; padding: 4px; min-width: 230px; }
+.month-picker .icon-btn { font-size: 1.5rem; line-height: 1; width: 44px; height: 40px; color: var(--primary); }
+.week-select { display: none; }
 
 /* ---------- Floating add button ---------- */
 .fab {
@@ -203,10 +207,13 @@ form .btn { width: 100%; }
   .sidebar nav { flex-direction: row; justify-content: space-around; width: 100%; }
   .nav-item { flex-direction: column; gap: 2px; font-size: 0.75rem; padding: 6px 16px; }
   .nav-item.active { box-shadow: none; }
+  /* Top bar is fixed: the Add button can be tapped at any moment */
   .topbar {
-    position: sticky; top: 0; z-index: 25;
-    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 25;
+    height: calc(64px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 16px 0;
   }
+  .main { padding-top: calc(64px + env(safe-area-inset-top)); }
   .topbar-add {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--primary); color: #fff; border: 0; border-radius: 999px;
@@ -216,7 +223,9 @@ form .btn { width: 100%; }
   .content { padding: 16px 16px calc(100px + env(safe-area-inset-bottom)); }
   .card { padding: 16px; }
   input, select { font-size: 16px; } /* Prevents the zoom on iPhone when focusing a field */
-  .stats { gap: 12px; }
+  .stats { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .main-stat { grid-column: 1 / -1; }
+  .stat { padding: 12px; }
   .stat .big { overflow-wrap: anywhere; }
   .week-head { flex-direction: column; gap: 2px; }
   .card-head { gap: 8px; }
@@ -227,9 +236,11 @@ form .btn { width: 100%; }
   .budget-row input { width: 100%; }
 
   /* Filters: scrollable week chips, full-width button */
-  .filters { flex-direction: column; align-items: stretch; gap: 14px; }
-  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-  .chip { white-space: nowrap; }
+  .filters { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; gap: 12px; }
+  .filters > * { min-width: 0; width: 100%; }
+  .month-picker { min-width: 0; }
+  .chips { display: none; }
+  .week-select { display: block; }
   .filters .btn { margin-left: 0; width: 100%; }
 
   /* The floating button is replaced by the top-bar button on mobile */
