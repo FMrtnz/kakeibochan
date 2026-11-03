@@ -13,6 +13,8 @@ A small **Progressive Web App** to manage your monthly budget, inspired by the J
 - **Quick add** – a floating **+** button on every page opens the expense form instantly.
 - **PDF report** – download a monthly report (summary, weekly budget, pie and column charts, expense list).
 - **Responsive** – sidebar on desktop, bottom bar and bottom-sheet forms on mobile, tables turn into cards.
+- **Category filter** – filter the Dashboard expense list by type or by category.
+- **CSV import / export** – a dedicated *Import / Export* page: back up your data to a `.csv` file (opens in Excel, Google Sheets, Numbers), or import categories and expenses (merge or replace). An example file is available in the app.
 - **Tables** – every page lists its items in a table with **Edit** and **Delete** buttons.
 - **Manage** – full lists of categories and expenses.
 - **Installable & offline** – works as an app on your phone or desktop.
@@ -35,15 +37,18 @@ src/
     constants.js            Category types and chart colours
     categoryModel.js        Create / validate categories
     expenseModel.js         Create / validate expenses, filters and totals
+    csvModel.js             App data <-> CSV text, parsing, import rules
     budgetModel.js          Weekly budget split (monthly budget / 5)
     storage.js              localStorage hook
   controllers/            CONTROLLER: connects models to views
     useBudgetController.js    Data + add / update / delete actions
     useDashboardController.js Month / week / chart filters, budget figures, report download
+    useDataController.js      CSV export / import actions
     useToast.js               Confirmation messages
   views/                  VIEW: what the user sees
     components/             Forms, tables, modal, sidebar
     pages/                  Dashboard, Add, Manage
+  services/fileService.js   Saves / reads text files in the browser
   services/pdfReport.js   Builds the monthly PDF report (loaded on demand)
   utils/format.js         Formatting and date helpers
   App.jsx                 Connects the controller to the views
@@ -89,3 +94,18 @@ npm run preview
 - The base path comes from the `VITE_BASE` environment variable (see `vite.config.js`).
   If you use a custom domain or a `<user>.github.io` repository, set it to `/`.
 - To install the app: open the site in Chrome/Edge/Safari and use **Install** / **Add to Home Screen**.
+
+## CSV format
+
+One row per expense, with a header row:
+
+```
+Date,Name,Amount,Category,Type
+2026-11-03,Weekly groceries,54.20,Groceries,Survival
+,,,Cinema,Leisure
+```
+
+- `Type` (Survival, Charges, Leisure) is required the first time a category appears.
+- A row with only a category creates an empty category.
+- Dates: `2026-11-03` or `03/11/2026`. Amounts: `12.5` or `12,5`.
+- Comma, semicolon or tab separators are detected automatically.

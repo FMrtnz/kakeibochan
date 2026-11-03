@@ -112,6 +112,12 @@ input:focus, select:focus { outline: 0; border-color: var(--primary); box-shadow
 .btn.primary:hover { background: var(--primary-dark); }
 .btn.light { background: #f1faff; color: var(--primary); }
 .btn.light:hover { background: var(--primary); color: #fff; }
+.file-btn { position: relative; display: block; text-align: center; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.report { list-style: none; margin: 16px 0 0; padding: 14px 16px; background: var(--bg); border-radius: 10px; display: grid; gap: 6px; font-size: 0.9rem; }
+.alert { background: #fff5f8; color: #f1416c; padding: 12px 16px; border-radius: 10px; font-weight: 600; }
+.form-card h2 { margin-bottom: 8px; }
+.form-card p { margin: 0 0 14px; }
 .btn:disabled { opacity: 0.6; cursor: wait; }
 form .btn { width: 100%; }
 
@@ -164,14 +170,15 @@ form .btn { width: 100%; }
 .week-row { text-align: left; width: 100%; background: var(--bg); border: 2px solid transparent; border-radius: 10px; padding: 12px 14px; cursor: pointer; color: inherit; }
 .week-row.selected { border-color: var(--primary); background: #f1faff; }
 .week-row .progress { margin: 8px 0 6px; background: #fff; }
-.week-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.week-head strong { font-size: 1.2rem; }
 .pos { color: #17c653; }
 .neg { color: #f1416c; }
 .filters .btn { margin-left: auto; }
 .filters { align-items: center; }
 .month-picker { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); border-radius: 10px; padding: 4px; min-width: 230px; }
 .month-picker .icon-btn { font-size: 1.5rem; line-height: 1; width: 44px; height: 40px; color: var(--primary); }
-.week-select { display: none; }
+.week-select, .category-filter { margin: 12px 0; }
 
 /* ---------- Floating add button ---------- */
 .fab {
@@ -227,7 +234,6 @@ form .btn { width: 100%; }
   .main-stat { grid-column: 1 / -1; }
   .stat { padding: 12px; }
   .stat .big { overflow-wrap: anywhere; }
-  .week-head { flex-direction: column; gap: 2px; }
   .card-head { gap: 8px; }
   .big { font-size: 1.4rem; }
   .small-big { font-size: 1.1rem; }
@@ -239,8 +245,6 @@ form .btn { width: 100%; }
   .filters { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; gap: 12px; }
   .filters > * { min-width: 0; width: 100%; }
   .month-picker { min-width: 0; }
-  .chips { display: none; }
-  .week-select { display: block; }
   .filters .btn { margin-left: 0; width: 100%; }
 
   /* The floating button is replaced by the top-bar button on mobile */

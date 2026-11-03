@@ -1,11 +1,9 @@
-import {
-  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid
-} from 'recharts'
 import useDashboardController from '../../controllers/useDashboardController.js'
-import ExpenseTable from '../components/ExpenseTable.jsx'
 import MonthPicker from '../components/MonthPicker.jsx'
-import { WEEK_DAYS } from '../../models/budgetModel.js'
+import BudgetCard from '../components/BudgetCard.jsx'
+import SpendingChart from '../components/SpendingChart.jsx'
+import CategoryFilter from '../components/CategoryFilter.jsx'
+import ExpenseTable from '../components/ExpenseTable.jsx'
 import { formatEuro } from '../../utils/format.js'
 
 // The view only displays what the dashboard controller computes
@@ -14,27 +12,8 @@ export default function Dashboard({ budget: b, onAdd }) {
 
   return (
     <>
-      {/* Filters */}
       <div className="card filters">
         <MonthPicker month={d.month} onChange={d.setMonth} />
-
-        {/* Desktop: week buttons */}
-        <div className="chips">
-          {['all', 1, 2, 3, 4, 5].map((w) => (
-            <button key={w} className={'chip' + (d.week === w ? ' on' : '')} onClick={() => d.setWeek(w)}>
-              {w === 'all' ? 'Whole month' : `Week ${w}`}
-            </button>
-          ))}
-        </div>
-
-        {/* Mobile: dropdown menu */}
-        <select className="week-select" aria-label="Filter by week" value={d.week}
-          onChange={(e) => d.setWeek(e.target.value === 'all' ? 'all' : Number(e.target.value))}>
-          <option value="all">Whole month</option>
-          {WEEK_DAYS.map((days, i) => (
-            <option key={days} value={i + 1}>Week {i + 1} (days {days})</option>
-          ))}
-        </select>
         <button className="btn light" onClick={d.downloadReport} disabled={d.downloading}>
           {d.downloading ? 'Preparing...' : '⬇ Download report (PDF)'}
         </button>
@@ -54,102 +33,17 @@ export default function Dashboard({ budget: b, onAdd }) {
         ))}
       </div>
 
-      {/* Budget: monthly or weekly view */}
+      <BudgetCard d={d} budget={b.budget} setBudget={b.setBudget} />
+      <SpendingChart d={d} onAdd={onAdd} />
+
+      {/* Expense list with its category filter */}
       <div className="card">
         <div className="card-head">
-          <h2>Budget</h2>
-          <div className="segmented small">
-            <button className={d.budgetView === 'month' ? 'on' : ''} onClick={() => d.setBudgetView('month')}>Monthly</button>
-            <button className={d.budgetView === 'week' ? 'on' : ''} onClick={() => d.setBudgetView('week')}>Weekly</button>
-          </div>
+          <h2>Expenses</h2>
+          <small className="muted">{d.listExpenses.length} · {formatEuro(d.listTotal)}</small>
         </div>
-
-        <div className="budget-row">
-          <input type="number" min="0" step="10" value={b.budget || ''} placeholder="Monthly budget (€)"
-            aria-label="Monthly budget in euros" onChange={(e) => b.setBudget(parseFloat(e.target.value) || 0)} />
-          {b.budget > 0 && <small className="muted">= {formatEuro(d.weekLimit)} per week</small>}
-        </div>
-
-        {b.budget <= 0 && <small className="muted">Set a monthly budget to follow your spending.</small>}
-
-        {b.budget > 0 && d.budgetView === 'month' && (
-          <>
-            <div className="progress"><div className={d.over ? 'over' : ''} style={{ width: d.percent + '%' }} /></div>
-            <small className="muted">
-              {d.over
-                ? `Over budget by ${formatEuro(d.monthTotal - b.budget)}`
-                : `${formatEuro(b.budget - d.monthTotal)} left of ${formatEuro(b.budget)}`}
-            </small>
-          </>
-        )}
-
-        {b.budget > 0 && d.budgetView === 'week' && (
-          <div className="weeks">
-            {d.weeks.map((w) => (
-              <button key={w.week} className={'week-row' + (d.week === w.week ? ' selected' : '')}
-                onClick={() => d.setWeek(w.week)}>
-                <div className="week-head">
-                  <span><strong>Week {w.week}</strong> <small className="muted">days {w.days}</small></span>
-                  <strong className={w.over ? 'neg' : 'pos'}>
-                    {w.over ? `Over by ${formatEuro(-w.remaining)}` : `${formatEuro(w.remaining)} left`}
-                  </strong>
-                </div>
-                <div className="progress"><div className={w.over ? 'over' : ''} style={{ width: w.percent + '%' }} /></div>
-                <small className="muted">{formatEuro(w.spent)} of {formatEuro(w.limit)}</small>
-              </button>
-            ))}
-            <small className="muted">Tap a week to filter the dashboard.</small>
-          </div>
-        )}
-      </div>
-
-      {/* Chart */}
-      <div className="card">
-        <div className="card-head">
-          <h2>Spending by category</h2>
-          <div className="segmented small">
-            <button className={d.chartType === 'pie' ? 'on' : ''} onClick={() => d.setChartType('pie')}>Pie</button>
-            <button className={d.chartType === 'bar' ? 'on' : ''} onClick={() => d.setChartType('bar')}>Columns</button>
-          </div>
-        </div>
-
-        {d.chartData.length === 0 ? (
-          <div className="empty">
-            <p>No expenses for this period.</p>
-            <button className="btn primary" onClick={onAdd}>Add one</button>
-          </div>
-        ) : (
-          <div className="chart">
-            <ResponsiveContainer width="100%" height="100%">
-              {d.chartType === 'pie' ? (
-                <PieChart>
-                  <Pie data={d.chartData} dataKey="value" nameKey="name" innerRadius="50%" outerRadius="80%" paddingAngle={2}>
-                    {d.chartData.map((x) => <Cell key={x.name} fill={x.color} />)}
-                  </Pie>
-                  <Tooltip formatter={(v) => formatEuro(v)} />
-                  <Legend />
-                </PieChart>
-              ) : (
-                <BarChart data={d.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 11 }}
-                    tickFormatter={(n) => (n.length > 9 ? n.slice(0, 8) + '…' : n)} />
-                  <YAxis tickFormatter={(v) => '€' + v} width={55} tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v) => formatEuro(v)} />
-                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                    {d.chartData.map((x) => <Cell key={x.name} fill={x.color} />)}
-                  </Bar>
-                </BarChart>
-              )}
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
-      {/* Expenses of the selected period */}
-      <div className="card">
-        <h2>Expenses of the period</h2>
-        <ExpenseTable expenses={d.visible} categories={b.categories}
+        <CategoryFilter categories={b.categories} value={d.categoryFilter} onChange={d.setCategoryFilter} />
+        <ExpenseTable expenses={d.listExpenses} categories={b.categories}
           onUpdate={b.updateExpense} onDelete={b.deleteExpense} />
       </div>
     </>

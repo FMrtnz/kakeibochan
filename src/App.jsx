@@ -7,8 +7,9 @@ import AddTabs from './views/components/AddTabs.jsx'
 import Dashboard from './views/pages/Dashboard.jsx'
 import AddPage from './views/pages/AddPage.jsx'
 import ManagePage from './views/pages/ManagePage.jsx'
+import DataPage from './views/pages/DataPage.jsx'
 
-const TITLES = { dashboard: 'Dashboard', add: 'Add', manage: 'Manage' }
+const TITLES = { dashboard: 'Dashboard', add: 'Add', manage: 'Manage', data: 'Import / Export' }
 
 // Connects the controller (data + actions) to the views
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           {page === 'dashboard' && <Dashboard budget={budget} onAdd={() => setQuickAdd(true)} />}
           {page === 'add' && <AddPage budget={budget} notify={notify} />}
           {page === 'manage' && <ManagePage budget={budget} />}
+          {page === 'data' && <DataPage budget={budget} />}
         </div>
       </main>
 

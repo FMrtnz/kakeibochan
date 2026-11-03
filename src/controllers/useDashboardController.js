@@ -1,23 +1,33 @@
 import { useState } from 'react'
 import { TYPES, PALETTE } from '../models/constants.js'
-import { filterByPeriod, sumAmounts, totalsByType, totalsByCategory } from '../models/expenseModel.js'
-import { weeklyBreakdown, weeklyLimit } from '../models/budgetModel.js'
-import { monthOf, todayISO } from '../utils/format.js'
+import {
+  filterByPeriod, filterByCategory, sumAmounts, totalsByType, totalsByCategory
+} from '../models/expenseModel.js'
+import { weeklyBreakdown, weeklyLimit, WEEKS_PER_MONTH } from '../models/budgetModel.js'
+import { monthOf, todayISO, weekOfMonth } from '../utils/format.js'
 
 // Dashboard controller: filter state + figures computed from the model.
 export default function useDashboardController(categories, expenses, budget) {
   const [month, setMonth] = useState(monthOf(todayISO())) // "YYYY-MM"
-  const [week, setWeek] = useState('all') // "all" or 1-5
   const [chartType, setChartType] = useState('pie') // "pie" or "bar"
   const [budgetView, setBudgetView] = useState('month') // "month" or "week"
+  const [weekPick, setWeekPick] = useState(Math.min(WEEKS_PER_MONTH, weekOfMonth(todayISO())))
+  const [categoryFilter, setCategoryFilter] = useState('all') // "all", "type:x" or "cat:id"
   const [downloading, setDownloading] = useState(false)
+
+  // Monthly tab = whole month, Weekly tab = the week picked in the dropdown
+  const week = budgetView === 'week' ? weekPick : 'all'
 
   const monthExpenses = filterByPeriod(expenses, month)
   const visible = filterByPeriod(expenses, month, week)
   const monthTotal = sumAmounts(monthExpenses)
 
-  // Generate and download the PDF report of the selected month.
-  // The PDF code is loaded on demand so it does not slow down the app start.
+  // The category filter only applies to the expense list (and ignores deleted categories)
+  const filterExists = !categoryFilter.startsWith('cat:') || categories.some((c) => 'cat:' + c.id === categoryFilter)
+  const activeFilter = filterExists ? categoryFilter : 'all'
+  const listExpenses = filterByCategory(visible, categories, activeFilter)
+
+  // Generate and download the PDF report of the selected month (code loaded on demand)
   const downloadReport = async () => {
     setDownloading(true)
     try {
@@ -28,9 +38,12 @@ export default function useDashboardController(categories, expenses, budget) {
     }
   }
 
+  const weeks = weeklyBreakdown(expenses, month, budget)
+
   return {
-    month, setMonth, week, setWeek, chartType, setChartType, budgetView, setBudgetView,
-    visible,
+    month, setMonth, week, weekPick, setWeekPick, chartType, setChartType, budgetView, setBudgetView,
+    categoryFilter: activeFilter, setCategoryFilter,
+    visible, listExpenses, listTotal: sumAmounts(listExpenses),
     total: sumAmounts(visible),
     typeTotals: totalsByType(visible, categories, TYPES),
     chartData: totalsByCategory(visible, categories, PALETTE),
@@ -38,9 +51,9 @@ export default function useDashboardController(categories, expenses, budget) {
     monthTotal,
     percent: budget > 0 ? Math.min(100, (monthTotal / budget) * 100) : 0,
     over: budget > 0 && monthTotal > budget,
-    // Weekly budget progress (budget / 5 for each week)
+    // Weekly budget progress (budget / 5)
     weekLimit: weeklyLimit(budget),
-    weeks: weeklyBreakdown(expenses, month, budget),
+    pickedWeek: weeks[weekPick - 1],
     downloadReport, downloading
   }
 }

@@ -28,7 +28,14 @@ export default function useBudgetController() {
 
   const deleteExpense = (id) => setExpenses(expenses.filter((e) => e.id !== id))
 
+  // Replace everything at once (used by the CSV import)
+  const replaceData = (newCategories, newExpenses) => {
+    setCategories(newCategories)
+    setExpenses(newExpenses)
+  }
+
   return {
+    replaceData,
     categories, expenses, budget, setBudget,
     addCategory, updateCategory, deleteCategory,
     addExpense, updateExpense, deleteExpense

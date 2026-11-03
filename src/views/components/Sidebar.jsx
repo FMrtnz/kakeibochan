@@ -2,7 +2,8 @@
 const ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'add', label: 'Add', icon: '➕' },
-  { id: 'manage', label: 'Manage', icon: '🗂️' }
+  { id: 'manage', label: 'Manage', icon: '🗂️' },
+  { id: 'data', label: 'Data', icon: '📁' }
 ]
 
 export default function Sidebar({ page, onNavigate }) {

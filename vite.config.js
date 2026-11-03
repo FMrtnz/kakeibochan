@@ -11,6 +11,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'icon-180.png'],
+      // The on-demand PDF chunk is large: allow them in the offline cache
+      workbox: { maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
       manifest: {
         name: 'Kakeibochan',
         short_name: 'Kakeibochan',

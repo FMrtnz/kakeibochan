@@ -24,6 +24,16 @@ export const sortByDateDesc = (expenses) => [...expenses].sort((a, b) => b.date.
 export const filterByPeriod = (expenses, month, week = 'all') =>
   expenses.filter((e) => monthOf(e.date) === month && (week === 'all' || weekOfMonth(e.date) === week))
 
+// Keep the expenses matching a filter: "all", "type:<typeId>" or "cat:<categoryId>"
+export const filterByCategory = (expenses, categories, filter) => {
+  if (filter.startsWith('type:')) {
+    const ids = new Set(categories.filter((c) => c.type === filter.slice(5)).map((c) => c.id))
+    return expenses.filter((e) => ids.has(e.categoryId))
+  }
+  if (filter.startsWith('cat:')) return expenses.filter((e) => e.categoryId === filter.slice(4))
+  return expenses
+}
+
 export const sumAmounts = (expenses) => expenses.reduce((sum, e) => sum + e.amount, 0)
 
 // Total spent per category type: [{ ...type, total }]
