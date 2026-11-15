@@ -19,7 +19,7 @@ export default function DataPage({ budget }) {
 
       <section className="card form-card">
         <h2>Export</h2>
-        <p className="muted">Download all your categories and expenses as a CSV file. Handy as a backup.</p>
+        <p className="muted">Download all your categories and expenses as a CSV file. Handy as a backup. Receipt photos are not included.</p>
         <div className="segmented">
           <button className={d.separator === ',' ? 'on' : ''} onClick={() => d.setSeparator(',')}>Comma ( , )</button>
           <button className={d.separator === ';' ? 'on' : ''} onClick={() => d.setSeparator(';')}>Semicolon ( ; )</button>

@@ -5,19 +5,21 @@ import Sidebar from './views/components/Sidebar.jsx'
 import Modal from './views/components/Modal.jsx'
 import AddTabs from './views/components/AddTabs.jsx'
 import Dashboard from './views/pages/Dashboard.jsx'
-import AddPage from './views/pages/AddPage.jsx'
 import ManagePage from './views/pages/ManagePage.jsx'
 import DataPage from './views/pages/DataPage.jsx'
 
-const TITLES = { dashboard: 'Dashboard', add: 'Add', manage: 'Manage', data: 'Import / Export' }
+const TITLES = { dashboard: 'Dashboard', manage: 'Manage', data: 'Import / Export' }
 
-// Connects the controller (data + actions) to the views
+// Connects the controller (data + actions) to the views.
+// Adding expenses and categories happens in the quick-add window, opened from any page.
 export default function App() {
-  const [page, setPage] = useState('dashboard') // Simple page switch, no router needed
-  const [quickAdd, setQuickAdd] = useState(false) // Quick-add window (floating button)
+  const [page, setPage] = useState('dashboard')
+  const [quickAdd, setQuickAdd] = useState(false)
   const [quickTab, setQuickTab] = useState('expense')
   const budget = useBudgetController()
   const { message, notify } = useToast()
+
+  const openAdd = () => setQuickAdd(true)
 
   return (
     <div className="layout">
@@ -25,31 +27,26 @@ export default function App() {
       <main className="main">
         <header className="topbar">
           <h1>{TITLES[page]}</h1>
-          {/* Top-right shortcut (mobile): always visible because the bar is sticky */}
-          {page !== 'add' && (
-            <button className="topbar-add" aria-label="Add an expense" onClick={() => setQuickAdd(true)}>
-              <span>+</span> Add
-            </button>
-          )}
+          {/* Always reachable on mobile: the top bar is fixed */}
+          <button className="topbar-add" aria-label="Add an expense or a category" onClick={openAdd}>
+            <span>+</span> Add
+          </button>
         </header>
         <div className="content">
-          {page === 'dashboard' && <Dashboard budget={budget} onAdd={() => setQuickAdd(true)} />}
-          {page === 'add' && <AddPage budget={budget} notify={notify} />}
+          {page === 'dashboard' && <Dashboard budget={budget} onAdd={openAdd} />}
           {page === 'manage' && <ManagePage budget={budget} />}
           {page === 'data' && <DataPage budget={budget} />}
         </div>
       </main>
 
-      {/* Floating button: add an expense from any page (hidden on the Add page itself) */}
-      {page !== 'add' && (
-        <button className="fab" aria-label="Add an expense" onClick={() => setQuickAdd(true)}>
-          <span className="fab-plus">+</span>
-          <span className="fab-label">Add expense</span>
-        </button>
-      )}
+      {/* Floating button on desktop (hidden on mobile, where the top bar button is used) */}
+      <button className="fab" aria-label="Add an expense or a category" onClick={openAdd}>
+        <span className="fab-plus">+</span>
+        <span className="fab-label">Add</span>
+      </button>
 
       {quickAdd && (
-        <Modal title="Quick add" onClose={() => setQuickAdd(false)}>
+        <Modal title="Add" onClose={() => setQuickAdd(false)}>
           <AddTabs
             tab={quickTab}
             setTab={setQuickTab}

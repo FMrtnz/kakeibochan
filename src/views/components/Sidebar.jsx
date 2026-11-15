@@ -1,7 +1,6 @@
 // Dark sidebar on desktop, bottom navigation bar on mobile (see styles.css)
 const ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-  { id: 'add', label: 'Add', icon: '➕' },
   { id: 'manage', label: 'Manage', icon: '🗂️' },
   { id: 'data', label: 'Data', icon: '📁' }
 ]

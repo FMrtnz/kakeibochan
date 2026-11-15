@@ -308,3 +308,16 @@ select {
   .table td.actions { gap: 4px; }
   .toast { font-size: 0.9rem; }
 }
+
+/* ---------- Expense list toolbar ---------- */
+.list-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
+.list-toolbar select { margin: 0; }
+@media (max-width: 800px) { .list-toolbar { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Receipt photos ---------- */
+.file-pick { position: relative; overflow: hidden; display: inline-block; }
+.file-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.photo-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.photo-actions .btn-sm { margin-left: 0; padding: 9px 14px; }
+.photo-preview { display: block; width: 100%; max-height: 220px; object-fit: contain; background: var(--bg); border-radius: 10px; margin-bottom: 4px; }
+.receipt-img { display: block; width: 100%; height: auto; border-radius: 10px; }

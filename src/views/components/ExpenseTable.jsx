@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { getType } from '../../models/constants.js'
-import { expenseLabel, sortByDateDesc } from '../../models/expenseModel.js'
+import { expenseLabel } from '../../models/expenseModel.js'
 import { formatEuro, prettyDate } from '../../utils/format.js'
 import ExpenseForm from './ExpenseForm.jsx'
+import ReceiptViewer from './ReceiptViewer.jsx'
 import Modal from './Modal.jsx'
 
-// Table of expenses with Edit / Delete buttons
+// Table of expenses (already sorted and filtered by the controller).
+// Each row can show its receipt, be edited or deleted.
 export default function ExpenseTable({ expenses, categories, onUpdate, onDelete }) {
-  const [editing, setEditing] = useState(null) // Expense being edited, or null
+  const [editing, setEditing] = useState(null) // Expense being edited
+  const [viewing, setViewing] = useState(null) // Expense whose receipt is shown
   const catById = Object.fromEntries(categories.map((c) => [c.id, c]))
 
   const remove = (e) => {
@@ -25,7 +28,7 @@ export default function ExpenseTable({ expenses, categories, onUpdate, onDelete 
             {expenses.length === 0 && (
               <tr><td colSpan="5" className="muted center">No expense yet.</td></tr>
             )}
-            {sortByDateDesc(expenses).map((e) => {
+            {expenses.map((e) => {
               const cat = catById[e.categoryId]
               return (
                 <tr key={e.id}>
@@ -36,6 +39,9 @@ export default function ExpenseTable({ expenses, categories, onUpdate, onDelete 
                   </td>
                   <td className="right" data-label="Amount"><strong>{formatEuro(e.amount)}</strong></td>
                   <td className="right actions">
+                    {e.hasReceipt && (
+                      <button className="btn-sm" aria-label="View receipt" onClick={() => setViewing(e)}>🧾</button>
+                    )}
                     <button className="btn-sm" onClick={() => setEditing(e)}>Edit</button>
                     <button className="btn-sm danger" onClick={() => remove(e)}>Delete</button>
                   </td>
@@ -52,10 +58,15 @@ export default function ExpenseTable({ expenses, categories, onUpdate, onDelete 
             categories={categories}
             initial={editing}
             submitLabel="Save changes"
-            onSubmit={(fields) => { onUpdate(editing.id, fields); setEditing(null) }}
+            onSubmit={async (fields, photo) => {
+              await onUpdate(editing.id, fields, photo) // Errors are shown by the form
+              setEditing(null)
+            }}
           />
         </Modal>
       )}
+
+      {viewing && <ReceiptViewer expense={viewing} onClose={() => setViewing(null)} />}
     </>
   )
 }

@@ -17,8 +17,24 @@ export const isValidExpense = ({ amount, date, categoryId }) =>
 // Display name of an expense: its own name, or the category name if it has none
 export const expenseLabel = (expense, category) => expense.name || category?.name || 'Unknown'
 
-// Newest first
-export const sortByDateDesc = (expenses) => [...expenses].sort((a, b) => b.date.localeCompare(a.date))
+// Sort options shown in the expense lists
+export const SORT_OPTIONS = [
+  { id: 'date-desc', label: 'Newest first' },
+  { id: 'date-asc', label: 'Oldest first' },
+  { id: 'amount-desc', label: 'Highest price first' },
+  { id: 'amount-asc', label: 'Lowest price first' }
+]
+
+// Return a sorted copy. Ties on price are ordered by date (newest first).
+export const sortExpenses = (expenses, sort) => {
+  const list = [...expenses]
+  switch (sort) {
+    case 'date-asc': return list.sort((a, b) => a.date.localeCompare(b.date))
+    case 'amount-desc': return list.sort((a, b) => b.amount - a.amount || b.date.localeCompare(a.date))
+    case 'amount-asc': return list.sort((a, b) => a.amount - b.amount || b.date.localeCompare(a.date))
+    default: return list.sort((a, b) => b.date.localeCompare(a.date))
+  }
+}
 
 // Keep the expenses of a month ("YYYY-MM"), optionally of a single week (1-5 or "all")
 export const filterByPeriod = (expenses, month, week = 'all') =>

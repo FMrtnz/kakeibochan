@@ -1,8 +1,7 @@
 import CategoryForm from './CategoryForm.jsx'
 import ExpenseForm from './ExpenseForm.jsx'
 
-// Tabs with the two forms (expense / category). Used on the Add page and in the quick-add window.
-// "tab" is controlled by the parent so it can show the matching table.
+// Tabs with the two forms (expense / category), used in the quick-add window
 export default function AddTabs({ tab, setTab, budget, onAdded }) {
   return (
     <>
@@ -16,7 +15,10 @@ export default function AddTabs({ tab, setTab, budget, onAdded }) {
           categories={budget.categories}
           submitLabel="Add expense"
           onNeedCategory={() => setTab('category')}
-          onSubmit={(fields) => { budget.addExpense(fields); onAdded('Expense added') }}
+          onSubmit={async (fields, photo) => {
+            await budget.addExpense(fields, photo)
+            onAdded('Expense added')
+          }}
         />
       ) : (
         <CategoryForm

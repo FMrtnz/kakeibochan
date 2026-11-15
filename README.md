@@ -23,33 +23,44 @@ A small **Progressive Web App** to manage your monthly budget, inspired by the J
 > Your data lives in the browser's `localStorage`. Clearing site data erases it, and it is
 > not shared between devices.
 
+## Receipt photos and sorting
+
+- **Receipt photos (optional):** when adding or editing an expense, attach a photo of the receipt.
+  The photo is resized and compressed in the browser, then stored in IndexedDB on this device.
+  Expense data stays in localStorage, so photos never block saving expenses.
+  Photos are deleted together with their expense, and they are **not** included in CSV exports.
+- **Sorting:** expense lists can be sorted by newest, oldest, highest price or lowest price.
+- **Filtering:** expense lists can be filtered by category or by type.
+
 ## Tech stack
 
 Vite · React · vite-plugin-pwa · Recharts · jsPDF (PDF report)
 
 ## Project structure (MVC)
 
-The code follows a Model / View / Controller organisation:
-
 ```
 src/
-  models/                 MODEL: data shape, business rules, storage
+  models/                 MODEL: data shape and business rules (pure functions)
     constants.js            Category types and chart colours
     categoryModel.js        Create / validate categories
-    expenseModel.js         Create / validate expenses, filters and totals
-    csvModel.js             App data <-> CSV text, parsing, import rules
+    expenseModel.js         Create / validate expenses, filters, sorting, totals
     budgetModel.js          Weekly budget split (monthly budget / 5)
+    csvModel.js             App data <-> CSV text, parsing, import rules
     storage.js              localStorage hook
-  controllers/            CONTROLLER: connects models to views
-    useBudgetController.js    Data + add / update / delete actions
-    useDashboardController.js Month / week / chart filters, budget figures, report download
-    useDataController.js      CSV export / import actions
-    useToast.js               Confirmation messages
+  controllers/            CONTROLLER: hooks that connect models to views
+    useBudgetController.js        Data + add / update / delete actions (incl. receipts)
+    useExpenseListController.js   Category filter and sort order of an expense list
+    useDashboardController.js     Period filters, budget figures, PDF download
+    useManageController.js        Data for the Manage page
+    useDataController.js          CSV export / import actions
+    useToast.js                   Confirmation messages
   views/                  VIEW: what the user sees
-    components/             Forms, tables, modal, sidebar
-    pages/                  Dashboard, Add, Manage
-  services/fileService.js   Saves / reads text files in the browser
-  services/pdfReport.js   Builds the monthly PDF report (loaded on demand)
+    components/             Forms, tables, toolbar, modal, charts, budget card...
+    pages/                  Dashboard, Manage, Import / Export
+  services/               Browser-specific or heavy code
+    receiptService.js       Receipt photos (IndexedDB) and image compression
+    fileService.js          Save / read text files
+    pdfReport.js            Monthly PDF report (loaded on demand)
   utils/format.js         Formatting and date helpers
   App.jsx                 Connects the controller to the views
   styles.css              Theme

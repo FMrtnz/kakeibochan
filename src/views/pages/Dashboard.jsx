@@ -2,7 +2,7 @@ import useDashboardController from '../../controllers/useDashboardController.js'
 import MonthPicker from '../components/MonthPicker.jsx'
 import BudgetCard from '../components/BudgetCard.jsx'
 import SpendingChart from '../components/SpendingChart.jsx'
-import CategoryFilter from '../components/CategoryFilter.jsx'
+import ExpenseListToolbar from '../components/ExpenseListToolbar.jsx'
 import ExpenseTable from '../components/ExpenseTable.jsx'
 import { formatEuro } from '../../utils/format.js'
 
@@ -36,14 +36,13 @@ export default function Dashboard({ budget: b, onAdd }) {
       <BudgetCard d={d} budget={b.budget} setBudget={b.setBudget} />
       <SpendingChart d={d} onAdd={onAdd} />
 
-      {/* Expense list with its category filter */}
       <div className="card">
         <div className="card-head">
           <h2>Expenses</h2>
-          <small className="muted">{d.listExpenses.length} · {formatEuro(d.listTotal)}</small>
+          <small className="muted">{d.list.count} · {formatEuro(d.list.total)}</small>
         </div>
-        <CategoryFilter categories={b.categories} value={d.categoryFilter} onChange={d.setCategoryFilter} />
-        <ExpenseTable expenses={d.listExpenses} categories={b.categories}
+        <ExpenseListToolbar list={d.list} categories={b.categories} />
+        <ExpenseTable expenses={d.list.items} categories={b.categories}
           onUpdate={b.updateExpense} onDelete={b.deleteExpense} />
       </div>
     </>
